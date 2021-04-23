@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: 1.0/210423_23_47_create_product_tabel.yaml
+      relativeToChangelogFile: true

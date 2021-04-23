@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://product-db:5432/product_db}
+    username: ${DATABASE_USER:product_db}
+    password: ${DATABASE_PASSWORD:product_db}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQL10Dialect

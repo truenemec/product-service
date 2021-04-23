@@ -1,0 +1,14 @@
+version: '3.3'
+services:
+  product-db:
+    image: postgres:12.4
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: product_db
+      POSTGRES_PASSWORD: product_db
+  product-service:
+    image: product-service:0.0.1-SNAPSHOT
+    ports:
+      - 9000:8080
