@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "product-chart.product-db.service.name" . }}
+  labels:
+    {{- include "product-chart.labels" . | nindent 4 }}
+    app: product-db
+    layer: database
+spec:
+  type: {{ .Values.product_db.service.type }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.product_db.service.port }}
+      targetPort: 5432
+  selector:
+    {{- include "product-chart.selectorLabels" . | nindent 4 }}
+    app: product-db
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "product-chart.product-db.deployment.name" . }}
+  labels:
+    {{- include "product-chart.labels" . | nindent 4 }}
+    app: postgres
+    layer: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "product-chart.selectorLabels" . | nindent 6 }}
+      app: product-db
+  template:
+    metadata:
+      labels:
+        {{- include "product-chart.selectorLabels" . | nindent 8 }}
+        app: product-db
+    spec:
+      containers:
+        - name: {{ include "product-chart.product-db.container.name" . }}
+          image: "{{ .Values.product_db.image.name }}:{{ .Values.product_db.image.tag }}"
+          env:
+            - name: POSTGRES_DB
+              value: {{ .Values.product_db.db.dbname }}
+            - name: POSTGRES_USER
+              value: {{ .Values.product_db.db.user }}
+            - name: POSTGRES_PASSWORD
+              value: {{ .Values.product_db.db.password }}
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -h
+                - localhost
+                - -U
+                - {{ .Values.product_db.db.user }}
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -h
+                - localhost
+                - -U
+                - {{ .Values.product_db.db.user }}
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          ports:
+            - containerPort: 5432
+              protocol: TCP

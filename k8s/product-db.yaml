@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: product-db
+    layer: database
+  name: product-db
+spec:
+  type: LoadBalancer
+  ports:
+    - protocol: TCP
+      port: 6001
+      targetPort: 5432
+  selector:
+    app: product-db
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: product-db
+  labels:
+    app: postgres
+    layer: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: product-db
+  template:
+    metadata:
+      labels:
+        app: product-db
+    spec:
+      containers:
+        - name: postgres
+          image:  postgres:12.4
+          env:
+            - name: POSTGRES_DB
+              value: product_db
+            - name: POSTGRES_USER
+              value: product_db
+            - name: POSTGRES_PASSWORD
+              value: product_db
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -h
+                - localhost
+                - -U
+                - product_db
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -h
+                - localhost
+                - -U
+                - product_db
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+          ports:
+            - containerPort: 5432
+              protocol: TCP

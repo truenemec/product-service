@@ -1,0 +1,2 @@
+kubectl top pods - shows resources
+minikube dashboard
