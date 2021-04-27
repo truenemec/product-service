@@ -1,2 +1,9 @@
 kubectl top pods - shows resources
 minikube dashboard
+
+
+jenkins plugin
+Docker
+Docker pipeline
+Remote File Plugin
+Kubernetes CLI.
