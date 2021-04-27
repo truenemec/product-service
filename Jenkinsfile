@@ -12,7 +12,7 @@ pipeline {
         stage('Build') {
           steps {
             checkout scm
-            chmod +x ./mvnw
+            chmod '+x ./mvnw'
             sh './mvnw compile'
           }
         }
