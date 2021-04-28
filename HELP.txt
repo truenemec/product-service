@@ -7,3 +7,9 @@ Docker
 Docker pipeline
 Remote File Plugin
 Kubernetes CLI.
+
+Jenkins set to english
+1) install Locale plugin
+2) Manage Jenkins -> Configure System.
+3) Under Locale, there will be a field called "Default Language". Enter the new language. It could be "en" or "ENGLISH".
+
