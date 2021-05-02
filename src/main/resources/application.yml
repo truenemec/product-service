@@ -7,3 +7,9 @@ spring:
   jpa:
     database: postgresql
     database-platform: org.hibernate.dialect.PostgreSQL10Dialect
+amazon:
+  aws:
+    access-key: fakeMyKeyId
+    secret-key: fakeSecretAccessKey
+    region: us-west-1
+    dynamo-db-endpoint: 'http://localhost:8000'
