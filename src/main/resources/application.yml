@@ -13,3 +13,7 @@ amazon:
     secret-key: fakeSecretAccessKey
     region: us-west-1
     dynamo-db-endpoint: 'http://localhost:8000'
+
+retry:
+  maxAttempts: 3
+  maxDelay: 100
