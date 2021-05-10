@@ -20,7 +20,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @RequiredArgsConstructor
 @Component
@@ -76,16 +78,20 @@ public class StreamHandlerImpl implements StreamHandler {
     }
 
     private void flush(MapperContext context){
-        context.getDataMapperResults().forEach(dataMapperResult -> {
-            Object data = dataMapperResult.getData();
-            if(data instanceof Item){
-                itemRepository.save((Item)data);
+        Stream.of(context)
+                .map(MapperContext::getDataMapperResults)
+                .flatMap(List::stream)
+                .map(DataMapperResult::getData)
+                .flatMap(List::stream)
+        .forEach(val -> {
+            if(val instanceof Item){
+                itemRepository.save((Item)val);
             }
-            else if(data instanceof ItemAggregated){
-                itemAggregatedRepository.save((ItemAggregated)data);
+            else if(val instanceof ItemAggregated){
+                itemAggregatedRepository.save((ItemAggregated)val);
             }
-            else if(data instanceof Metadata){
-                metadataRepository.save((Metadata)data);
+            else if(val instanceof Metadata){
+                metadataRepository.save((Metadata)val);
             }
         });
         context.getDataMapperResults().clear();
@@ -109,6 +115,6 @@ public class StreamHandlerImpl implements StreamHandler {
     }
     private void handleMapperResult(DataMapperResult result, MapperContext context){
         context.getDataMapperResults().add(result);
-        result.getData().setStatistic(fillStatistic(context));
+        result.getData().forEach(val -> val.setStatistic(fillStatistic(context)));
     }
 }

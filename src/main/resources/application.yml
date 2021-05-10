@@ -33,6 +33,22 @@ visa-map-config:
       column-name: cred
     debit:
       column-name: deb
+  aggregated:
+    rule1:
+      columns:
+        - name: title
+          type: string
+          values:
+            - jira
+#        - name: title
+#          type: string
+#          values:
+#            - jira
+#        - name: cred
+#          type: bigdecimal
+#          values:
+#            - 22
+
 
 stream:
   max-byte-threshold: 1024

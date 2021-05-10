@@ -30,6 +30,7 @@ public class BufferedInputStreamReader implements Closeable {
     }
     public String readLine() throws IOException {
         int val;
+        byteBuffer.clear();
         while ((val = inputStream.read()) != -1){
             offset++;
             if(val == '\r'){
@@ -50,9 +51,7 @@ public class BufferedInputStreamReader implements Closeable {
 
         }
         byteBuffer.flip();
-        String result =  StandardCharsets.UTF_8.decode(byteBuffer).toString();
-        byteBuffer.rewind();
-        return result;
+        return StandardCharsets.UTF_8.decode(byteBuffer).toString();
     }
 
     @Override

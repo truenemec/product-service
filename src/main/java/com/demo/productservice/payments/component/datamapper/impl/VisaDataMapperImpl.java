@@ -7,16 +7,19 @@ import com.demo.productservice.payments.model.Item;
 import com.demo.productservice.payments.model.Metadata;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.function.Predicate;
 
 @Component
 @RequiredArgsConstructor
 @EnableConfigurationProperties(VisaDataMapperConfig.class)
 @Getter
+@Slf4j
 public class VisaDataMapperImpl implements DataMapper {
     private final static String DEBIT_SUM = "DEB_SUM";
     private final static String CREDIT_SUM = "CREDIT_SUM";
@@ -24,13 +27,16 @@ public class VisaDataMapperImpl implements DataMapper {
 
     @Override
     public Optional<DataMapperResult> map(String line, MapperContext context) {
-        StatisticAware output = null;
+        List<StatisticAware> output = new ArrayList<>();
 
         if(isColumnHeader(context)){
-            output = handleColumnRow(line, context);
+            StatisticAware val = handleColumnRow(line, context);
+            output.add(val);
+
         }
         if(isDataRow(context)){
-            output = handleDataRow(line, context);
+            StatisticAware val = handleDataRow(line, context);
+            output.add(val);
         }
 
         DataMapperResult result = DataMapperResult
@@ -59,9 +65,9 @@ public class VisaDataMapperImpl implements DataMapper {
 
     private StatisticAware handleDataRow(String line, MapperContext context){
         VisaColumn visaColumn = parseDataColumn(line, context);
-        Item item = convert(visaColumn);
-        aggregate(item, context);
-        return item;
+        Item value = convert(visaColumn);
+        aggregate(value, context);
+        return value;
     }
 
     private void aggregate(Item item, MapperContext context){
@@ -78,7 +84,7 @@ public class VisaDataMapperImpl implements DataMapper {
                 .build();
         DataMapperResult result = DataMapperResult
                 .builder()
-                .data(total)
+                .data(Collections.singletonList(total))
                 .build();
         return Collections.singletonList(result);
     }
@@ -87,8 +93,8 @@ public class VisaDataMapperImpl implements DataMapper {
         String[] values = line.split(getVisaDataMapperConfig().getFileDelimiter());
         return VisaColumn.builder()
                 .title(values[Utils.getColumnPosition(visaDataMapperConfig.getColumnMap().getTitle(), context)])
-                .cred(new BigDecimal(values[Utils.getColumnPosition(visaDataMapperConfig.getColumnMap().getDebit(),context)].trim()))
-                .deb(new BigDecimal(values[Utils.getColumnPosition(visaDataMapperConfig.getColumnMap().getCredit(), context)].trim()))
+                .deb(new BigDecimal(values[Utils.getColumnPosition(visaDataMapperConfig.getColumnMap().getDebit(),context)].trim()))
+                .cred(new BigDecimal(values[Utils.getColumnPosition(visaDataMapperConfig.getColumnMap().getCredit(), context)].trim()))
                 .build();
     }
 
@@ -102,6 +108,11 @@ public class VisaDataMapperImpl implements DataMapper {
     }
 
     private Item convert(VisaColumn visaColumn){
+        VisaDataMapperConfig.Aggregated aggregated = visaDataMapperConfig.getAggregated();
+        Predicate<VisaColumn> isAggregated = PredicateFactory.create(aggregated.getRule1());
+        if(isAggregated.test(visaColumn)){
+            log.error("AGGREGATED");
+        }
         return Item.builder()
                 .title(visaColumn.getTitle())
                 .debit(visaColumn.getDeb())
