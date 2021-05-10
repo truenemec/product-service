@@ -17,3 +17,24 @@ amazon:
 retry:
   maxAttempts: 3
   maxDelay: 100
+
+mastercard-handler:
+  default-path: 'e:\CODE\new-demo\product-service\src\test\resources\sample\mastercard\'
+
+visa-handler:
+  default-path: 'e:\CODE\new-demo\product-service\src\test\resources\sample\visa\'
+
+visa-map-config:
+  header-column-number: 1
+  column-map:
+    title:
+      column-name: title
+    credit:
+      column-name: cred
+    debit:
+      column-name: deb
+
+stream:
+  max-byte-threshold: 1024
+  max-line-threshold: 2
+

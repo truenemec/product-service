@@ -14,9 +14,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MessageRepositoryImpl implements MessageRepository {
 
-    final Class<MessageItem> clazz = MessageItem.class;
+    private final Class<MessageItem> clazz = MessageItem.class;
 
-    final DynamoDBMapper dynamoDBMapper;
+    private final DynamoDBMapper dynamoDBMapper;
 
     @Override
     public PaginatedList<MessageItem> findBySeverity(String severity) {
