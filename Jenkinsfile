@@ -13,7 +13,6 @@ pipeline {
           steps {
             checkout scm
             sh 'chmod +x ./mvnw'
-//             sh './mvnw build-helper:parse-version versions:set   -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.nextIncrementalVersion}\${parsedVersion.qualifier?}'
             sh './mvnw clean compile'
           }
         }
