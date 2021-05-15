@@ -1,9 +1,12 @@
 package com.demo.productservice.payments.component.datamapper.impl;
 
 import com.demo.productservice.payments.component.datamapper.*;
+import com.demo.productservice.payments.component.datamapper.config.common.Aggregated;
 import com.demo.productservice.payments.component.datamapper.config.VisaDataMapperConfig;
 import com.demo.productservice.payments.dto.VisaColumn;
 import com.demo.productservice.payments.model.Item;
+import com.demo.productservice.payments.model.ItemAggregated;
+import com.demo.productservice.payments.model.ItemBase;
 import com.demo.productservice.payments.model.Metadata;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -65,12 +68,12 @@ public class VisaDataMapperImpl implements DataMapper {
 
     private StatisticAware handleDataRow(String line, MapperContext context){
         VisaColumn visaColumn = parseDataColumn(line, context);
-        Item value = convert(visaColumn);
+        ItemBase value = convert(visaColumn);
         aggregate(value, context);
         return value;
     }
 
-    private void aggregate(Item item, MapperContext context){
+    private void aggregate(ItemBase item, MapperContext context){
         Utils.sum(context, DEBIT_SUM, item::getDebit);
         Utils.sum(context, CREDIT_SUM, item::getCredit);
     }
@@ -107,16 +110,24 @@ public class VisaDataMapperImpl implements DataMapper {
         return map;
     }
 
-    private Item convert(VisaColumn visaColumn){
-        VisaDataMapperConfig.Aggregated aggregated = visaDataMapperConfig.getAggregated();
-        Predicate<VisaColumn> isAggregated = PredicateFactory.create(aggregated.getRule1());
+    private ItemBase convert(VisaColumn visaColumn){
+        Aggregated aggregated = visaDataMapperConfig.getAggregated();
+        Predicate<VisaColumn> isAggregated = PredicateFactory
+                .create(aggregated.getRules());
+        ItemBase item;
         if(isAggregated.test(visaColumn)){
-            log.error("AGGREGATED");
+            item = ItemAggregated.builder()
+                    .title(visaColumn.getTitle())
+                    .debit(visaColumn.getDeb())
+                    .credit(visaColumn.getCred())
+                    .build();
+        } else {
+            item = Item.builder()
+                    .title(visaColumn.getTitle())
+                    .debit(visaColumn.getDeb())
+                    .credit(visaColumn.getCred())
+                    .build();
         }
-        return Item.builder()
-                .title(visaColumn.getTitle())
-                .debit(visaColumn.getDeb())
-                .credit(visaColumn.getCred())
-                .build();
+        return item;
     }
 }

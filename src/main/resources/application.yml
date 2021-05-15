@@ -34,12 +34,17 @@ visa-map-config:
     debit:
       column-name: deb
   aggregated:
-    rule1:
-      columns:
+    rules:
+      - columns:
         - name: title
           type: string
           values:
             - jira
+      - columns:
+          - name: title
+            type: string
+            values:
+              - aws
 #        - name: title
 #          type: string
 #          values:
@@ -52,5 +57,5 @@ visa-map-config:
 
 stream:
   max-byte-threshold: 1024
-  max-line-threshold: 2
+  max-line-threshold: 1
 

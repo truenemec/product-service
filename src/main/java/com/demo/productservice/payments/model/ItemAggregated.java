@@ -1,21 +1,41 @@
 package com.demo.productservice.payments.model;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
-import com.demo.productservice.payments.component.datamapper.StatisticAware;
-import lombok.Builder;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 @DynamoDBTable(tableName = "item_aggregated")
-@Data
-@Builder
-public class ItemAggregated implements StatisticAware {
+@SuperBuilder
+public class ItemAggregated extends ItemBase {
+    @Data
+    @RequiredArgsConstructor
+    public static class Key{
+        private final String fileName;
+        private final String title;
+
+    }
+    public static Key getKey(ItemAggregated itemAggregated){
+        return new Key(itemAggregated.getFileName(), itemAggregated.getTitle());
+    }
+
     @DynamoDBHashKey(attributeName="file_name")
-    private String fileName;
+    public String getFileName(){
+        return super.getFileName();
+    }
     @DynamoDBRangeKey(attributeName = "title")
-    private String title;
-    @DynamoDBAttribute(attributeName = "metadata")
-    private Statistic statistic;
+    public String getTitle(){
+        return super.getTitle();
+    }
+    public ItemAggregated add(ItemAggregated itemAggregated){
+        return ItemAggregated.builder()
+                .title(this.getTitle())
+                .statistic(this.getStatistic())
+                .credit(this.getCredit().add(itemAggregated.getCredit()))
+                .debit(this.getDebit().add(itemAggregated.getDebit()))
+                .build();
+    }
+
 }

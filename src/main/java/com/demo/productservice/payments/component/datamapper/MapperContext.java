@@ -1,5 +1,6 @@
 package com.demo.productservice.payments.component.datamapper;
 
+import com.demo.productservice.payments.model.ItemAggregated;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -21,4 +22,5 @@ public class MapperContext {
     private Map<String, String> aggregation = new HashMap<>();
     private long flushedBytes;
     private long flushedLines;
+    private Map<ItemAggregated.Key, ItemAggregated> itemAggregatedMap = new HashMap<>();
 }

@@ -1,6 +1,6 @@
 package com.demo.productservice.payments.component.datamapper;
 
-import com.demo.productservice.payments.component.datamapper.config.VisaDataMapperConfig;
+import com.demo.productservice.payments.component.datamapper.config.common.Column;
 
 import java.math.BigDecimal;
 import java.util.function.Supplier;
@@ -12,7 +12,7 @@ public interface Utils {
         context.getAggregation().put(aggregationName, val.toString());
     }
 
-    static Integer getColumnPosition(VisaDataMapperConfig.Column column, MapperContext context){
+    static Integer getColumnPosition(Column column, MapperContext context){
         return context.getColumnMap().get(column.getColumnName());
     }
 }

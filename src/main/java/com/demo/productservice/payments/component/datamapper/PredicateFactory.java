@@ -1,10 +1,10 @@
 package com.demo.productservice.payments.component.datamapper;
 
-import com.demo.productservice.payments.component.datamapper.config.VisaDataMapperConfig;
+import com.demo.productservice.payments.component.datamapper.config.common.Rule;
 import com.demo.productservice.payments.dto.VisaColumn;
-import com.demo.productservice.payments.model.Item;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -15,7 +15,7 @@ public class PredicateFactory {
             ofEntries(Map.entry("title", VisaColumn::getTitle),
                     Map.entry("cred", VisaColumn::getCred));
 
-    public static Predicate<VisaColumn> create(VisaDataMapperConfig.Rule rule){
+    public static Predicate<VisaColumn> create(Rule rule){
         return (val) -> rule.getColumns().stream().allMatch(column -> {
             Object value = map.get(column.getName()).apply(val);
             String type = column.getType().toUpperCase();
@@ -27,5 +27,9 @@ public class PredicateFactory {
             }
             return false;
         });
+    }
+
+    public static Predicate<VisaColumn> create(List<Rule> rules){
+        return rules.stream().map(PredicateFactory::create).reduce(Predicate::or).orElse(v -> false);
     }
 }

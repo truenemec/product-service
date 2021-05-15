@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 @RequiredArgsConstructor
 @EnableConfigurationProperties(VisaPaymentHandlerConfigProperties.class)
 public class VisaPaymentHandler extends AbstractPaymentHandlerImpl implements PaymentHandler {
-    private PaymentProviderType paymentProviderType = PaymentProviderType.VISA;
+    private final PaymentProviderType paymentProviderType = PaymentProviderType.VISA;
     private final StreamHandler streamHandler;
     private final VisaDataMapperImpl dataMapper;
     private final VisaPaymentHandlerConfigProperties properties;

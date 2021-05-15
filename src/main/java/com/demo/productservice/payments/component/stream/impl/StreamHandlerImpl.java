@@ -1,15 +1,13 @@
 package com.demo.productservice.payments.component.stream.impl;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
 import com.demo.productservice.payments.component.datamapper.StatisticAware;
-import com.demo.productservice.payments.model.Item;
+import com.demo.productservice.payments.model.*;
 import com.demo.productservice.payments.component.datamapper.DataMapper;
 import com.demo.productservice.payments.component.datamapper.DataMapperResult;
 import com.demo.productservice.payments.component.datamapper.MapperContext;
 import com.demo.productservice.payments.component.stream.StreamHandler;
 import com.demo.productservice.payments.component.stream.impl.config.StreamHandlerConfig;
-import com.demo.productservice.payments.model.ItemAggregated;
-import com.demo.productservice.payments.model.Metadata;
-import com.demo.productservice.payments.model.Statistic;
 import com.demo.productservice.payments.repository.ItemAggregatedRepository;
 import com.demo.productservice.payments.repository.ItemRepository;
 import com.demo.productservice.payments.repository.MetadataRepository;
@@ -20,8 +18,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
@@ -67,7 +65,12 @@ public class StreamHandlerImpl implements StreamHandler {
     }
 
     private void initContext(MapperContext context){
-        Statistic statistic = getAllStatisticByFileName(context.getFileName());
+
+        PaginatedScanList<ItemAggregated> data = itemAggregatedRepository.getAll();
+        Map<ItemAggregated.Key, ItemAggregated> aggregatedMap = data.stream()
+                .collect(Collectors.toMap(ItemAggregated::getKey, val -> val));
+        context.setItemAggregatedMap(aggregatedMap);
+        Statistic statistic = getAllStatisticByFileName(context.getFileName(), context);
         context.setProceedBytes(statistic.getProceedBytes());
         context.setProceedLines(statistic.getProceedLines());
         context.setFlushedBytes(statistic.getProceedBytes());
@@ -75,6 +78,7 @@ public class StreamHandlerImpl implements StreamHandler {
         context.setAggregation(statistic.getAggregation());
         metadataRepository.getByKey(context.getFileName())
                 .ifPresent(val -> context.setColumnMap(val.getColumnMap()));
+
     }
 
     private void flush(MapperContext context){
@@ -88,7 +92,16 @@ public class StreamHandlerImpl implements StreamHandler {
                 itemRepository.save((Item)val);
             }
             else if(val instanceof ItemAggregated){
-                itemAggregatedRepository.save((ItemAggregated)val);
+                ItemAggregated newValue;
+                ItemAggregated.Key key = ItemAggregated.getKey((ItemAggregated)val);
+                Optional<ItemAggregated> prevValue = Optional.ofNullable(context.getItemAggregatedMap().get(key));
+                if(prevValue.isPresent()){
+                    newValue = prevValue.get().add((ItemAggregated)val);
+                } else{
+                    newValue = (ItemAggregated)val;
+                }
+                context.getItemAggregatedMap().put(key, newValue);
+                itemAggregatedRepository.save(newValue);
             }
             else if(val instanceof Metadata){
                 metadataRepository.save((Metadata)val);
@@ -108,11 +121,19 @@ public class StreamHandlerImpl implements StreamHandler {
                 .build();
     }
 
-    private Statistic getAllStatisticByFileName(String fileName){
-        return itemRepository.getByFileNameLatest(fileName)
-                .map(StatisticAware::getStatistic)
-                .orElseGet(Statistic::new);
+    private Statistic getAllStatisticByFileName(String fileName, MapperContext context){
+        Optional<Statistic> itemAggregatedMax = context.getItemAggregatedMap().values().stream()
+                .map(ItemAggregated::getStatistic)
+                .max(Comparator.comparing(Statistic::getProceedBytes));
+       return Stream.of(
+               itemAggregatedMax.orElseGet(Statistic::new),
+               itemRepository.getByFileNameLatest(fileName)
+                    .map(StatisticAware::getStatistic)
+                    .orElseGet(Statistic::new))
+               .max(Comparator.comparing(Statistic::getProceedBytes))
+               .orElseGet(Statistic::new);
     }
+
     private void handleMapperResult(DataMapperResult result, MapperContext context){
         context.getDataMapperResults().add(result);
         result.getData().forEach(val -> val.setStatistic(fillStatistic(context)));
