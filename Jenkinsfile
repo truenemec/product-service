@@ -18,7 +18,7 @@ pipeline {
         }
         stage('Test') {
           steps {
-            sh './mvnw test'
+            sh './mvnw integration-test'
             junit '**/target/surefire-reports/TEST-*.xml'
           }
         }
