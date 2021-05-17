@@ -1,7 +1,7 @@
 package com.demo.productservice.domain;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 
@@ -9,6 +9,9 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Table(name = "product")
+@Builder
+@AllArgsConstructor
+@Setter
 public class Product {
     @Id
     @Column(name = "id")
@@ -16,4 +19,7 @@ public class Product {
     private Long id;
     @Column(name = "name")
     private String name;
+    @ManyToOne
+    @JoinColumn(name="category_id", nullable=false)
+    private Category category;
 }

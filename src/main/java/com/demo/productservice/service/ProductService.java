@@ -6,4 +6,5 @@ import java.util.Optional;
 
 public interface ProductService {
     Optional<Product> findById(Long id);
+    Product save(Product product);
 }

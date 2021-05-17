@@ -6,10 +6,9 @@ import com.demo.productservice.exception.NotFoundException;
 import com.demo.productservice.service.ProductService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping("api/v1/product")
@@ -26,5 +25,15 @@ public class ProductController {
         return getProductService().findById(id)
                 .map(getProductConverter()::convertToDto)
                 .orElseThrow(NotFoundException::new);
+    }
+
+    @PostMapping
+    public ProductDto save(@RequestBody ProductDto productDto){
+        return Optional.of(productDto)
+                .map(getProductConverter()::convertToDomain)
+                .map(getProductService()::save)
+                .map(getProductConverter()::convertToDto)
+                .get();
+
     }
 }

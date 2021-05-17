@@ -10,4 +10,5 @@ import lombok.Getter;
 public class ProductDto {
     private Long productId;
     private String name;
+    private Long categoryId;
 }

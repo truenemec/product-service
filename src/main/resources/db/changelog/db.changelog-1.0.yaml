@@ -2,3 +2,6 @@ databaseChangeLog:
   - include:
       file: 1.0/210423_23_47_create_product_tabel.yaml
       relativeToChangelogFile: true
+  - include:
+      file: 1.0/211615_13_30_add_category.yaml
+      relativeToChangelogFile: true

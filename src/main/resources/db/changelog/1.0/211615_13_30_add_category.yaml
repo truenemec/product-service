@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 211615_13_30_add_category.yaml
+      author: truenemec
+      changes:
+        - sql:
+            create table category(
+            id bigserial,
+            name varchar(255),
+            created timestamp,
+            modified timestamp,
+            version int4,
+            CONSTRAINT pk_category PRIMARY KEY (id)
+            )
+        - addColumn:
+            tableName: product
+            columns:
+              name: category_id
+              type: bigint
+              constraints:
+                - nullable: false
+        - addPrimaryKey:
+            columnNames: id
+            constraintName: pk_product
+            tableName: product
+        - addForeignKeyConstraint:
+            baseColumnNames: category_id
+            baseTableName: product
+            constraintName: fk_product_category_id
+            deferrable: true
+            initiallyDeferred: true
+            referencedColumnNames: id
+            referencedTableName: category
