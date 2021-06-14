@@ -2,6 +2,8 @@ package com.demo.productservice.rest;
 
 import com.demo.productservice.converter.MessageConverter;
 import com.demo.productservice.dto.MessageDto;
+
+import com.demo.productservice.dto.Response;
 import com.demo.productservice.exception.NotFoundException;
 import com.demo.productservice.service.MessageService;
 import lombok.AllArgsConstructor;
@@ -50,5 +52,14 @@ public class MessageController {
                 .map(messageService::save)
                 .map(SaveResponse::new)
                 .orElseThrow(()-> new IllegalStateException("guid should be set"));
+    }
+
+    @PostMapping("transform")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Response transform(@RequestBody MessageDto messageDto){
+        return Response.builder()
+                .guid(messageDto.getGuid())
+                .map(messageDto.getData())
+                .build();
     }
 }

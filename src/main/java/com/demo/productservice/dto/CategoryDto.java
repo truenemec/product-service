@@ -1,19 +1,16 @@
 package com.demo.productservice.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Value;
 
 import java.util.List;
 
-@Getter
-@Setter
+
 @Builder
-@AllArgsConstructor
+@Value
 public class CategoryDto {
-    private Long categoryId;
-    private String name;
-    private List<Long> productIds;
-    private Integer version;
+    Long categoryId;
+    String name;
+    List<Long> productIds;
+    Integer version;
 }

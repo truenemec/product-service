@@ -1,14 +1,21 @@
 package com.demo.productservice.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Value;
 
-@AllArgsConstructor
+import javax.validation.Valid;
+import java.math.BigDecimal;
+import java.util.Set;
+
+
 @Builder
-@Getter
+@Value
 public class ProductDto {
-    private Long productId;
-    private String name;
-    private Long categoryId;
+    Long productId;
+
+    String name;
+    BigDecimal price;
+    Long categoryId;
+    @Valid
+    Set<TestDto> testDtos;
 }

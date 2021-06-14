@@ -26,7 +26,6 @@ public class CategoryConverterImpl implements CategoryConverter {
 
     @Override
     public CategoryDto convertToDto(Category category) {
-        log.info("is transaction active = " + TransactionSynchronizationManager.isActualTransactionActive());
         return CategoryDto.builder()
                 .categoryId(category.getId())
                 .name(category.getName())

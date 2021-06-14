@@ -13,3 +13,13 @@ Jenkins set to english
 2) Manage Jenkins -> Configure System.
 3) Under Locale, there will be a field called "Default Language". Enter the new language. It could be "en" or "ENGLISH".
 
+docker tag product-service:0.0.1-SNAPSHOT truenemec/product-service:0.0.1-SNAPSHOT
+docker image push truenemec/product-service:0.0.1-SNAPSHOT
+minikube start
+minikube tunnel
+kubectl apply -f ./k8s/
+kubectl delete -f ./k8s/
+
+helm install product-app ./product-chart/
+helm uninstall product-app
+

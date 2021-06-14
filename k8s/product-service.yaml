@@ -40,7 +40,7 @@ spec:
     spec:
       containers:
         - name: product-service
-          image: truenemec/product-service:0.0.1-SNAPSHOT
+          image: truenemec/product-service:0.0.3-SNAPSHOT
           env:
             - name: DATABASE_URL
               valueFrom:

@@ -16,7 +16,7 @@ product_service:
     type: LoadBalancer
   image:
     name: truenemec/product-service
-    tag: 0.0.1-SNAPSHOT
+    tag: 0.0.3-SNAPSHOT
     pullPolicy: IfNotPresent
 
 product_db:

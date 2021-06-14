@@ -9,9 +9,9 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor
 @Table(name = "product")
-@Builder
+@Builder(toBuilder = true)
 @AllArgsConstructor
-@Setter
+//@Setter
 public class Product {
     @Id
     @Column(name = "id")
